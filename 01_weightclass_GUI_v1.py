@@ -1,68 +1,74 @@
 from tkinter import *
-from functools import partial  # To prevent unwanted windows
+
+# Sample data to simulate attempts history
+attempts_data = [
+    {"questions_asked": 10, "correct_answers": 7},
+    {"questions_asked": 15, "correct_answers": 10},
+    {"questions_asked": 20, "correct_answers": 18},
+    {"questions_asked": 5, "correct_answers": 4},
+    {"questions_asked": 12, "correct_answers": 6},
+    {"questions_asked": 8, "correct_answers": 5}
+]
 
 
-class ChooseWeight:
+def stats(attempts):
+    # Get the four most recent attempts
+    recent_attempts = attempts[-4:]
 
-    def __init__(self):
+    # Calculate the total questions asked and total correct answers
+    total_questions = sum(attempt["questions_asked"] for attempt in attempts)
+    total_correct_answers = sum(attempt["correct_answers"] for attempt in attempts)
 
-        button_font = ("Arial", "13", "bold")
-        button_fg = "#FFFFFF"
+    # Calculate the average correct answer percentage and round it to a whole number
+    if total_questions > 0:
+        average_correct_percentage = round((total_correct_answers / total_questions) * 100)
+    else:
+        average_correct_percentage = 0
 
-        # set up GUI frame
-        self.intro_frame = Frame(padx=50, pady=60)
-        self.intro_frame.grid()
+    return {
+        "recent_attempts": recent_attempts,
+        "average_correct_percentage": average_correct_percentage,
+        "total_correct_answers": total_correct_answers,
+        "total_questions_asked": total_questions
+    }
 
-        # heading and brief instructions
-        self.temp_heading = Label(self.intro_frame,
-                                  text="Undisputed Boxing Champions Quiz",
-                                  font=("Arial", "16", "bold"))
 
-        self.temp_heading.grid(row=0)
+class Statistics:
+    def __init__(self, parent):
+        self.stats_frame = Frame(parent, padx=50, pady=60)
+        self.stats_frame.grid()
 
-        choose_instruction_txt = "\n\nThis quiz will test your boxing" \
-                                 "knowledge by giving you a date that" \
-                                 "a boxer became the undisputed " \
-                                 "champion, you will then be provided " \
-                                 "with four possible answers in the form " \
-                                 "of a multi-choice question with one " \
-                                 "answer being correct...\n\n" \
-                                 "After completing the quiz you " \
-                                 "will get a score out of how many " \
-                                 "questions you got correct e.g. " \
-                                 "6/10 or 13/20 etc...\n\n" \
-                                 "To begin, please choose what " \
-                                 "weight-class you want to be quizzed on..."
+        stats_output = stats(attempts_data)
 
-        self.choose_instructions_label = Label(self.intro_frame,
-                                               text=choose_instruction_txt,
-                                               wraplength=400,
-                                               justify="left")
-        self.choose_instructions_label.grid(row=1)
+        # Display statistics
+        Label(self.stats_frame, text="Statistics", font=("Arial", "16", "bold")).grid(row=0, columnspan=2)
 
-        # rounds buttons...
-        self.which_weight_frame = Frame(self.intro_frame)
-        self.which_weight_frame.grid(row=2)
+        recent_attempts_text = "\n".join(
+            [f"{attempt['correct_answers']} / {attempt['questions_asked']}" for attempt in
+             stats_output["recent_attempts"]]
+        )
+        Label(self.stats_frame, text=recent_attempts_text, bg="#990000", fg="#FFFFFF",
+              font=("Arial", 12), padx=10, pady=5).grid(row=1, column=0, sticky="nw")
 
-        self.heavy_button = Button(self.which_weight_frame, fg=button_fg,
-                                   bg="#990000", text="Heavyweight",
-                                   font=button_font, width=13, height=2)
-        self.heavy_button.grid(row=0, column=0, padx=5, pady=5)
+        Label(self.stats_frame, text="Average Percentage", bg="#990000", fg="#FFFFFF",
+              font=("Arial", 12, "bold"), padx=10, pady=5).grid(row=2, column=0, sticky="nw")
+        Label(self.stats_frame, text=f"{stats_output['average_correct_percentage']}%", bg="#990000", fg="#FFFFFF",
+              font=("Arial", 12), padx=10, pady=5).grid(row=2, column=1, sticky="nw")
 
-        self.middle_button = Button(self.which_weight_frame, fg=button_fg,
-                                    bg="#006600", text="Middleweight",
-                                    font=button_font, width=13, height=2)
-        self.middle_button.grid(row=0, column=1, padx=10, pady=10)
+        Label(self.stats_frame, text="Total Questions Answered", bg="#990000", fg="#FFFFFF",
+              font=("Arial", 12, "bold"), padx=10, pady=5).grid(row=3, column=0, sticky="nw")
+        Label(self.stats_frame, text=f"{stats_output['total_questions_asked']}", bg="#990000", fg="#FFFFFF",
+              font=("Arial", 12), padx=10, pady=5).grid(row=3, column=1, sticky="nw")
 
-        self.light_button = Button(self.which_weight_frame, fg=button_fg,
-                                   bg="#330066", text="Lightweight",
-                                   font=button_font, width=13, height=2)
-        self.light_button.grid(row=0, column=2, padx=5, pady=5)
+        Label(self.stats_frame, text="Total Correct Answers", bg="#990000", fg="#FFFFFF",
+              font=("Arial", 12, "bold"), padx=10, pady=5).grid(row=4, column=0, sticky="nw")
+        Label(self.stats_frame, text=f"{stats_output['total_correct_answers']}", bg="#990000", fg="#FFFFFF",
+              font=("Arial", 12), padx=10, pady=5).grid(row=4, column=1, sticky="nw")
 
 
 # main routine
 if __name__ == "__main__":
     root = Tk()
-    root.title("Undisputed Quiz")
-    ChooseWeight()
+    root.title("Quiz Statistics")
+    Statistics(root)
     root.mainloop()

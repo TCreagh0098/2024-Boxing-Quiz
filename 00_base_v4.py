@@ -101,7 +101,7 @@ class NumberQuestions:
         instructions = "To continue with the quiz please enter " \
                        "how many questions you wish to " \
                        "answer...\n\nDepending on which weight " \
-                       "class you selected there will be a limit " \
+                       " class you selected there will be a limit " \
                        "to how many questions can be " \
                        "generated...\n\nHow many questions do " \
                        "you want to be generated..."
@@ -132,7 +132,6 @@ class NumberQuestions:
                                         command=self.start_quiz)
         self.quiz_begin_button.grid(row=0, column=0, padx=5, pady=5)
 
-    # checks user has entered
     def check_question(self, min_value, max_value):
         has_error = "no"
         response = self.question_entry.get()
@@ -153,7 +152,6 @@ class NumberQuestions:
             self.var_has_error.set("no")
             return int(response)
 
-    # turns
     def output_answer(self):
         output = self.var_feedback.get()
         has_errors = self.var_has_error.get()
@@ -234,7 +232,6 @@ class Quiz:
                 round_boxers_list.append(chosen_boxer)
         return round_boxers_list
 
-    # updates question count for the user to see what round they're on
     def update_question(self):
         self.questions_asked += 1
 
@@ -280,13 +277,67 @@ class Quiz:
         if self.questions_asked < self.num_questions:
             self.update_question()
         else:
-            messagebox.showinfo("Quiz Completed",
-                                f"You have completed the quiz!\nYour score: {self.score}/{self.num_questions}")
-            self.root.destroy()
+            global user_score, questions_answered
+            user_score = self.score
+            questions_answered = self.num_questions
+            self.show_end_screen()
+
+    def show_end_screen(self):
+        self.intro_frame.destroy()
+        self.question_frame.destroy()
+        self.answer_frame.destroy()
+        EndScreen(self.root)
+
+
+class EndScreen:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Undisputed Quiz")
+
+        button_font = ("Arial", "13", "bold")
+        button_fg = "#FFFFFF"
+
+        self.frame = Frame(self.root, padx=50, pady=50)
+        self.frame.pack()
+
+        self.intro_frame = Frame(self.frame, pady=10)
+        self.intro_frame.grid(row=0, columnspan=3)
+
+        self.congrats_label = Label(self.intro_frame, text="Congratulations!", font=("Arial", 24), fg="#006600")
+        self.congrats_label.pack()
+
+        self.score_label = Label(self.intro_frame, text="You got *{}* / *{}*".format(user_score, questions_answered),
+                                 font=("Arial", 14), fg="#006600")
+        self.score_label.pack()
+
+        self.winner_frame = Frame(self.frame, pady=10)
+        self.winner_frame.grid(row=1, columnspan=3)
+
+        self.winner_image = PhotoImage(file="Winner_Belt.png")  # image selected through path
+        self.winner_label = Label(self.winner_frame, image=self.winner_image)
+        self.winner_label.pack()
+
+        self.buttons_frame = Frame(self.frame, pady=10)
+        self.buttons_frame.grid(row=2, columnspan=3)
+
+        self.stats_button = Button(self.buttons_frame, text="Stats", bg="#330066", fg="#FFFFFF", font=button_font,
+                                   width=13, height=2)
+        self.stats_button.grid(row=0, column=0, padx=10)
+
+        self.play_again_button = Button(self.buttons_frame, text="Play Again", bg="#006600", fg="#FFFFFF",
+                                        font=button_font, width=13, height=2)
+        self.play_again_button.grid(row=0, column=1, padx=10)
+
+        self.exit_button = Button(self.buttons_frame, text="Exit", bg="#990000", fg="#FFFFFF", font=button_font,
+                                  width=13, height=2, command=self.root.quit)
+        self.exit_button.grid(row=0, column=2, padx=10)
 
 
 # Main routine
 if __name__ == "__main__":
+    user_score = 0
+    questions_answered = 0
+
     root = Tk()
     ChooseWeight(root)
     root.mainloop()

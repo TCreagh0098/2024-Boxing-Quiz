@@ -8,6 +8,7 @@ attempts_data = [
     {"questions_asked": 8, "correct_answers": 5}
 ]
 
+
 def stats(attempts):
     # Get the four most recent attempts
     recent_attempts = attempts[-4:]
@@ -28,6 +29,7 @@ def stats(attempts):
         "total_correct_answers": total_correct_answers,
         "total_questions_asked": total_questions
     }
+
 
 # Call the function and print the results
 stats_output = stats(attempts_data)
